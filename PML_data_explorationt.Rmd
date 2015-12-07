@@ -1,0 +1,204 @@
+---
+title: "PML Assignment Report"
+author: "David A York"
+date: "November 7, 2015"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+## Executive Summary
+This project assignment studies a model to control for the effect of proper activity teqhnique by constructing a model to predict the occurence deviation from technique. The data to be use to construct a prediction model is from the [Human Activity Recognition](http://groupware.les.inf.puc-rio.br/har). Selected analysis focuses on use of data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants.
+
+```{r mainblock, echo=FALSE, warning=FALSE, message=FALSE}
+## R Main Code Block
+# figures and tables are call by small code blocks for printing at the appropriate 
+#   places below.
+
+# load required libraries and functions
+library(caret)
+library(ggplot2)
+library(lattice)
+library(knitr)
+library(leaps)
+library(GGally)
+
+##  GET and CLEAN data ##################
+
+# fetch Training and Testing data (if necessary)
+if(!file.exists("train.csv")){
+  fileUrlTrain <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+  download.file(fileUrlTrain, destfile = "train.csv")
+  # save the download dates for reference
+  dateTrainDownloaded <- date()
+}
+if(!file.exists("test.csv")){
+  fileUrlTest <-"https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+  download.file(fileUrlTest, destfile = "test.csv")
+  # save the download dates for reference
+  dateTestDownloaded <- date()
+}
+
+
+## Read in (load) the data files for training and testing  ######
+trainingData <- read.csv("train.csv")
+testingData <- read.csv("test.csv")
+
+accTrainVarList <- c(1,2,3,4,5,6,7,11,27,40,41,42,49,50,63,64,65,102,103,116,117,118,140,141,154,155,156,160)
+length(accTrainVarList)
+accTrainData <- trainingData[,accTrainVarList]
+## account for the NA in the var_accel_ variables among the acceleration varaibles
+for(i in c(1:28)) {
+  varLen <- length(na.omit((accTrainData[,i])))
+  ## UNCOMMENT to count NAs in the var_accel_ columns## print(varLen)
+}
+
+## end of data aquision and subsetting ####################
+
+## Clean and tidy data  #############
+
+# List ALL variables by Name, and Construct Table of these 
+# construct a vector of column numbers not all NA, to clean dataframe ie check for
+varNames <- colnames(trainingData)
+## Table of variables
+trainVariableTable <- cbind(varNames[c(1:40)], varNames[c(41:80)], varNames[c(81:120)], varNames[c(121:160)])
+colnames(trainVariableTable)<-c("Var# 1:40","Var# 41:80","Var# 81:120","Var# 121:160")
+
+## Training data first
+# some factor variables s/b other
+
+# cvdt_timestamp, ie var# 5, correct to DATE type (POSIXlt)
+#    var# 3 and 4 s/b ok as interger (esp. for now)
+trainingData$cvtd_timestamp <-strptime(as.character(trainingData$cvtd_timestamp), "%d/%m/%Y %H:%M")
+
+# construct a vector of column numbers to check that varibles not all NA, 
+#    i.e. check for completely empty variables
+y = NULL
+for (i in c(1:160)) {
+  x <- trainingData[!is.na(trainingData[,i]),1]
+  one <- as.character(i)
+  two <- as.character(length(x))
+  ##UNCOMMENT to print data census for traing data##  print(paste(one,two))
+  if (!length(x)==0) y = c(y,i)
+}
+
+# output estimate of variables with no data (na) at all
+## check variable count for empty variables, s/b 160 variables
+## UNCOMMENT to show number of non-empty variables##  length(y)
+varclass <- NULL
+for (i in c(1:160)){
+   varclass <- c(varclass,class(trainingData[,i]))
+   print(length(varclass))
+   print(colnames(trainingData[i]))
+}
+## Store the varible list by variable class
+dataClasses <- t(rbind(colnames(trainingData), varclass))
+write.csv2("dataClasses.csv")
+## make vectors of column endices by variable class to confirm interity with class
+intVarClasses <- read.csv("intVarClasses.csv")
+factorVarClasses <- read.csv("factorVarClasses.csv")
+trainingFactorData <-trainingData[,c(factorVarClasses$X2[c(-1,-2,-36)])]
+
+## Refer to structure of factor variables, and note all these actually contain numeric (floats) data
+## UNCOMMENT to see structure ##  
+  ## str(trainingFactorData)
+# Make a vector index of factor variables
+factVarIdx <- c(factorVarClasses$X2[c(-1,-2,-36)])
+
+# make vector index of all "#DIV/0"  to change to NA
+divfactorIDX <-trainingFactorData=="#DIV/0!"
+## blank out the  #DIV/0! entries
+trainingFactorData[divfactorIDX] <-""
+
+## adjust classes to numeric where appropriate and create NAs for missing data
+for (i in factVarIdx) {
+  trainingData[,i] <-as.numeric(as.character(trainingData[,i]))
+}
+## Now all factor var in training data which are numeric have been changed as such
+##    and #DIV/0! considered missing data and missing data coded NA
+
+
+## Testing data is somewhat cleaner, missing values appropriately shown 
+##    but the same factor variables which s/b numeric are present.
+
+## correcting variable classes where needed
+for (i in c(11:159)) {
+  testingData[,i] <-as.numeric(as.character(testingData[,i]))
+}
+## UNCOMMENT to display structure of testing dataset##   str(testingData)
+
+## end of data tidying ################
+
+## Data exploration
+
+
+
+```
+
+## Model Requirements (Purpose)
+Devices such as Jawbone Up, Nike FuelBand, and Fitbit are able to collect a large amount of data about personal activity (of individual whereing the devices) as part of the quantified self movement (QSM). 
+
+People in the QSM regularly quantify how much of a particular activity they do, but they rarely quantify how well they do it. The effectiveness of such activities is assumed to be related to carrying it out with proper technique.
+
+Data was collected from accelerometers on the belt, forearm, arm, and dumbell of 6 participants asked to perform barbell lifts correctly and incorrectly in 5 different ways. Using this data, a model is build to detect improper activity teqhnique in Human Activity Recognition (HAR) data by constructing a prediction model for the occurence of deviation from correct activity technique. 
+
+## Data Cleaning 
+The data to be used to construct the prediction model is from the [Human Activity  Recognition](http://groupware.les.inf.puc-rio.br/har). This was downloaded in edited form from a location specifically for this assignment (see Appendix II Assignment Criteria as set out by instructors, Leek et al.) Selected analysis focuses on use of data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. It should be noted that this subset of the datasets has missing data in the var_accel_ data for each body part.
+
+## Data Exploration
+figure3 <- ggpairs(accTrainData[,c(8:27)])
+
+## Model Building
+
+
+## Model Validation
+
+
+### Expected Error
+
+
+### Error Estimation
+
+
+
+
+
+
+
+
+## Apendix I: Report Figures
+
+
+## Appendix II: Project [R] Code Listing
+```{r 'show-code', ref.label=all_labels(), eval=FALSE}
+```
+
+## Appendix III Assignment Criteria
+
+### Background
+
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from [the HAR website](http://groupware.les.inf.puc-rio.br/har) (see the section on the Weight Lifting Exercise Dataset). 
+
+### Data Source(s)
+
+The data for this project come from the [source](http://groupware.les.inf.puc-rio.br/har). 
+
+The training data for this project are available for download from  https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available for download from  https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+### Purpose
+Project goal is to predict the manner in which exercise is performed (technique). 
+
+### Method
+The response is the "classe" variable in the training set. Determine a set of variables which best predicts technique (classe). 
+
+The Report describes how the model was built, how cross validation was used, the expected out of sample error, and why the choices were made. 
+
+Finally, the prediction model is used to predict 20 different test cases to determine it's accuracy. 
+
+### Requirements
+1. Submit a link to a Github repo with the R markdown and compiled HTML file describing the analysis. The text of the writeup should be < 2000 words and the number of figures less than 5. Submitting a repo with a gh-pages branch is desirable so the HTML page can be viewed online.
+2. The Machine Learning Algorithm will be applied to the 20 test cases available in the test data above. submitting the predictions, in appropriate format, to the programming assignment for automated grading. (See the [programming assignment](https://class.coursera.org/predmachlearn-034/human_grading/view/courses/975204/assessments/4/submissions) for additional details.
+
+
