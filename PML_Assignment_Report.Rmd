@@ -10,6 +10,8 @@ output:
 ## Executive Summary
 This project assignment studies a model to control for the effect of proper activity teqhnique by constructing a model to predict the occurence deviation from technique. The data to be use to construct a prediction model is from the [Human Activity Recognition](http://groupware.les.inf.puc-rio.br/har). Selected analysis focuses on use of data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants.
 
+The resulting random forest based model was able to predice but the true resukts were blinded. The Accuracy (Error) estimation from the resampling used was 99.3% (error 0.7%).
+
 ```{r mainblock, echo=FALSE, warning=FALSE, message=FALSE}
 ## R Main Code Block
 # figures and tables are call by small code blocks for printing at the appropriate 
@@ -153,9 +155,10 @@ See the structure on the training data selected for the model in Appendix Table 
 See the paires plot in Appendix Figure 1
 
 ## Model Building
-
+The model resulting is,
 ```{r model, echo=FALSE, message=FALSE}
 modelfit52
+modelfit52$finalModel
 print(plot10)
 ```
 
@@ -164,19 +167,22 @@ Model validation is inherent in the resampling of the train() function. The vali
 
 
 ### Expected Error
-Predicting on the test data based on the model (without NAs)
+The expected error is evident from the model result above. The actual accuracy with the test set cannot be derived as these are the unknowns, being blinded for the Questions 1 to 20. Checked elsewhere.
+
+Predicting on the test data with the model model built with the random forest method obtains,
 ```{r errorEXP, echo=FALSE, message=FALSE}
-modelfit52
-modelfit52$finalModel
+testing[,c(1:8,60)]
 ```
 
 ### Error Estimation
+
+Next we will review the the accurate and associated miss-classification errors. Consider the confusion matrix.
 ```{r errorEst, echo=FALSE, message=FALSE}
 cM <- confusionMatrix(modelfit52)
+cM
 errRate <- 100 - sum(cM$table[1,1],cM$table[2,2],cM$table[3,3],cM$table[4,4],cM$table[5,5])
-errRate
 ```
-From the confusion matrix it can be seen that 0.1% of B and C and 0.3% of D were miss-classified so the error rate is `r errRate`
+An estimate of the error rate is evident from the summary in the confusion matrix showing 0.1% of B and C and 0.3% of D were miss-classified, so the error rate is `r errRate`
 
 
 ## Appendices
@@ -187,14 +193,14 @@ From the confusion matrix it can be seen that 0.1% of B and C and 0.3% of D were
 # display Training structure
 str(training)
 ```
-**#Figure 1 Compare the example exercise and classe**
+**#Figure 1 Compare the exercises and classe**
 ```{r plot9, echo=FALSE, warning=FALSE, message=FALSE}
 # display the pairs plot
 plot5()
 
 plot6()
 
-plot10
+plot9
 ```
 
 
