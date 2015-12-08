@@ -1,0 +1,259 @@
+---
+title: "PML Assignment Report"
+author: "David A York"
+date: "November 7, 2015"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+## Executive Summary
+This project assignment studies a model to control for the effect of proper activity teqhnique by constructing a model to predict the occurence deviation from technique. The data to be use to construct a prediction model is from the [Human Activity Recognition](http://groupware.les.inf.puc-rio.br/har). Selected analysis focuses on use of data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants.
+
+```{r mainblock, echo=FALSE, warning=FALSE, message=FALSE}
+## R Main Code Block
+# figures and tables are call by small code blocks for printing at the appropriate 
+#   places below.
+
+# load required libraries and functions
+library(caret)
+library(randomForest)
+library(ggplot2)
+library(GGally)
+library(lattice)
+library(knitr)
+
+##  GET and CLEAN data ##################
+
+# fetch Training and Testing data (if necessary)
+if(!file.exists("train.csv")){
+  fileUrlTrain <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+  download.file(fileUrlTrain, destfile = "train.csv")
+  # save the download dates for reference
+  dateTrainDownloaded <- date()
+}
+if(!file.exists("test.csv")){
+  fileUrlTest <-"https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+  download.file(fileUrlTest, destfile = "test.csv")
+  # save the download dates for reference
+  dateTestDownloaded <- date()
+}
+
+
+## Read in (load) the data files for training and testing  ######
+training <- read.csv("train.csv")
+testing <- read.csv("test.csv")
+## end of data aquision  ####################
+
+## Clean and tidy data and subsetting  #############
+#   remove and "#DIV/0" to make missing data
+divfactorIDX <-training=="#DIV/0!"
+training[divfactorIDX] = NA
+
+# cvdt_timestamp, ie var# 5, correct to DATE type (POSIXlt)
+#    var# 3 and 4 s/b ok as interger (esp. for now)
+training$cvtd_timestamp <-strptime(as.character(training$cvtd_timestamp), "%d/%m/%Y %H:%M")
+# make variables 7 to 159 all numeric
+for(i in c(7:159))
+  { 
+    training[,i] <-as.numeric(as.character(training[,i]))
+} 
+
+for(i in c(7:159))
+  { 
+    testing[,i] <-as.numeric(as.character(testing[,i]))
+}
+
+#remove NA columns
+# Routine to remove na values (Coursera, PML Discussion, Thread, "Error message when using train(), working on project", 11-22-20156 10:02AM,
+    # see https://class.coursera.org/predmachlearn-034/forum/thread?thread_id=129&utm_medium=email&u     #   tm_source=other&utm_campaign=notifications.auto.V_7MppEiEeWqDRKfSaeX2Q#post-484
+    # by ARJUN KV @ https://github.com/arj27083)
+
+    # "You don't get the error if you remove variables with NA values. 
+    #  Use the following code to remove it."
+    # "Note: Must also remove zero variates for which need nearZeroVar() function."
+    naVar <-function(df){
+      na_var <- apply(!is.na(df),2,sum) #identifying the no of NAs in each column
+      na_var <- na_var == nrow(df)  #Identifying columns that don't have complete data without NA
+      df <- df[ , na_var]  #Filtering out variables with NA values
+      return(df)
+    }
+
+# now clean the NA columns out of the dataframes
+training <- naVar(training) # note last training column is now the classe factor variable
+testing <- naVar(testing)   # note last column is redundant and classe is omitted for testing 
+testing <- testing[,-60]    # remove redundant column
+
+## end of data tidying
+
+
+## Data exploration #################
+## Plots
+##  scatter plots
+plot1 <- qplot(training$classe,training$accel_belt_y, main = "classe vs accel_belt_y")
+plot2 <- qplot(training$classe,training$accel_dumbbell_y, main = "classe vs accel_dumbbell_x")
+plot3 <- qplot(training$classe,training$accel_arm_z, main = "classe vs accel_arm_z")
+plot4 <- qplot(training$classe,training$accel_forearm_z, main = "classe vs accel_forearm_z")
+##  bar and whisker plots
+plot5 <- function(){plot(training$classe,training$accel_belt_x, type="p",main = "classe vs accel_belt_x")}
+plot6 <- function(){plot(training$classe,training$accel_dumbbell_y, type="p",main = "classe vs accel_dumbbell_y")}
+plot7 <- function(){plot(training$classe,training$accel_arm_z, type="p",main = "classe vs accel_arm_z")}
+plot8 <- function(){plot(training$classe,training$accel_forearm_x, type="p",main = "classe vs accel_forearm_x")}
+##  pairs plot
+plot9 <- ggpairs(training[,c(15,29,43,55,60)])
+## end data exploration ##
+
+## Build and Assess Model ####################
+# built using numeric variables 8:59 as regressors and classe factor varibale (column 60) 
+#  as the response variable
+## model validation by the resampling method(s) inherent in the train() function
+modelfit52 <- train(classe~.,data = training[,-c(1:7)], method="rf")
+
+
+# plot groups in data, and their centers
+##belt_arm_x <- classCenter(training[,c(15,28)], training$classe, training)
+##belt_arm_x <- as.data.frame(belt_arm_x)
+##belt_arm_x$classe <- rownames(belt_arm_x)
+
+plot10 <- qplot(accel_belt_x,accel_arm_x, col="classe", data=training)
+##plot10 <- plot10+geom_point(aes(accel_belt_x, accel_arm_x,col=classe), size=5, shape=4, data= training)
+
+## Carry out predition using testing data with model fit from the training data
+pred <- predict(modelfit52,testing[,-c(1:7)])
+testing$predRight <- pred
+
+
+## Files for 20 questions
+answers = as.vector(as.character(pred))
+  # Function to make files
+  pml_write_files = function(x){
+    n = length(x)
+    for(i in 1:n){
+      filename = paste0("problem_id_",i,".txt")
+      write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+    }
+  }
+
+pml_write_files(answers)
+```
+
+
+## Model Requirements (Purpose)
+Devices such as Jawbone Up, Nike FuelBand, and Fitbit are able to collect a large amount of data about personal activity (of individual whereing the devices) as part of the quantified self movement (QSM). 
+
+People in the QSM regularly quantify how much of a particular activity they do, but they rarely quantify how well they do it. The effectiveness of such activities is assumed to be related to carrying it out with proper technique.
+
+Data was collected from accelerometers on the belt, forearm, arm, and dumbell of 6 participants asked to perform barbell lifts correctly and incorrectly in 5 different ways. Using this data, a model is build to detect improper activity teqhnique in Human Activity Recognition (HAR) data by constructing a prediction model for the occurence of deviation from correct activity technique. 
+
+## Data Cleaning 
+The data to be used to construct the prediction model is from the [Human Activity  Recognition](http://groupware.les.inf.puc-rio.br/har). This was downloaded in edited form from a location specifically for this assignment (see Appendix II Assignment Criteria as set out by instructors, Leek et al.) Selected analysis focuses on use of data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. It should be noted that this subset of the datasets has missing data in the var_accel_ data for each body part.
+
+## Data Exploration
+See the structure on the training data selected for the model in Appendix Table 1.
+See the paires plot in Appendix Figure 1
+
+## Model Building
+
+```{r model, echo=FALSE, message=FALSE}
+modelfit52
+print(plot10)
+```
+
+## Model Validation
+Model validation is inherent in the resampling of the train() function. The validity is determine through the metric(s) chosen to drive the resampling with the accuracy and error rate visualized below from the confusion matrix and the means of the resampling accuracy and kappa.  
+
+
+### Expected Error
+Predicting on the test data based on the model (without NAs)
+```{r errorEXP, echo=FALSE, message=FALSE}
+modelfit52
+modelfit52$finalModel
+```
+
+### Error Estimation
+```{r errorEst, echo=FALSE, message=FALSE}
+cM <- confusionMatrix(modelfit52)
+errRate <- 100 - sum(cM$table[1,1],cM$table[2,2],cM$table[3,3],cM$table[4,4],cM$table[5,5])
+errRate
+```
+From the confusion matrix it can be seen that 0.1% of B and C and 0.3% of D were miss-classified so the error rate is `r errRate`
+
+
+## Appendices
+### Apendix I: Report Figures
+
+**Table 1 The Structure of Actual Training Data for the Model**
+```{r tabstr, echo=FALSE, warning=FALSE, message=FALSE}
+# display Training structure
+str(training)
+```
+**#Figure 1 Compare the example exercise and classe**
+```{r plot9, echo=FALSE, warning=FALSE, message=FALSE}
+# display the pairs plot
+plot5()
+
+plot6()
+
+plot10
+```
+
+
+### Appendix II: Project [R] Code Listing
+```{r 'show-code', ref.label=all_labels(), eval=FALSE}
+```
+
+## Appendix III Assignment Criteria
+
+### Background
+
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from [the HAR website](http://groupware.les.inf.puc-rio.br/har) (see the section on the Weight Lifting Exercise Dataset). 
+
+### Data Source(s)
+
+The data for this project come from the [source](http://groupware.les.inf.puc-rio.br/har). 
+
+The training data for this project are available for download from  https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available for download from  https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+### Purpose
+Project goal is to predict the manner in which exercise is performed (technique). 
+
+### Method
+The response is the "classe" variable in the training set. Determine a set of variables which best predicts technique (classe). 
+
+The Report describes how the model was built, how cross validation was used, the expected out of sample error, and why the choices were made. 
+
+Finally, the prediction model is used to predict 20 different test cases to determine it's accuracy. 
+
+### Requirements
+1. Submit a link to a Github repo with the R markdown and compiled HTML file describing the analysis. The text of the writeup should be < 2000 words and the number of figures less than 5. Submitting a repo with a gh-pages branch is desirable so the HTML page can be viewed online.
+2. The Machine Learning Algorithm will be applied to the 20 test cases available in the test data above. submitting the predictions, in appropriate format, to the programming assignment for automated grading. (See the [programming assignment](https://class.coursera.org/predmachlearn-034/human_grading/view/courses/975204/assessments/4/submissions) for additional details.
+
+### Submitting the Predictions to the Questions
+Apply the machine learning algorithm you built to each of the 20 test cases in the testing data set. See the prediction assignment writeup below on how model to be build. For each test case, submit a text file with a single capital letter (A, B, C, D, or E) corresponding to your prediction for the corresponding problem in the test data set. Score is 1 point for each correct answer. May be submitted up to 2 times for each problem. It is a lot of files to submit so it may be helpful to use the following function to create the files from a character vector with the 20 predictions in correct order for the 20 problems.  
+
+Something like (note these are not the right answers!):
+```
+    answers = rep("A", 20)
+```    
+then load the following function by copying and pasting it into R: 
+```
+  pml_write_files = function(x){
+    n = length(x)
+    for(i in 1:n){
+      filename = paste0("problem_id_",i,".txt")
+      write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+    }
+  }
+```
+create a folder where the files are to be written. Set that to be your working directory and run: 
+```
+    pml_write_files(answers)
+```
+to create one file for each submission. 
+
+Note: using this script, make sure the files that get written out have one character each with the prediction for the corresponding problem ID. The script produces strange results if the answers variable is not a character vector. 
+
+
+
