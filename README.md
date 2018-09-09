@@ -24,13 +24,13 @@
       
 <p><a href="http://medmatix.github.io/SimpleCalc/">SimpleCalc - A Simple Calulator Application.</a></p>
 
-<p><a href="http://medmatix.github.io/DataSciCalc/">DataSciCalcCalc - A Calulator Data Science Calculator Application.</a></p>
+<p><a href="http://medmatix.github.io/DataSciCalc/">DataSciCalc - A Calulator Data Science Calculator Application.</a></p>
 
 <p><a href="http://medmatix.github.io/SimpleCalc/">SimpleCalc - A Calulator Application.</a></p>
       
 <p><a href="https://medmatixrshiny.shinyapps.io/DataProdProj/">Developing DataProducts Course Project</a></p>
       
-<p><a href="https://medmatix.github.io/DSCS_NLP_Project/">Natural Language Course Project</a></p>
+<p><a href="https://medmatix.github.io/DSCS_NLP_Project/">Natural Language Course Project </a>Capstone for JHU/Coursera Specialization in Data Science</p>
 
 
   </body>
