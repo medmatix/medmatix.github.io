@@ -46,13 +46,8 @@ http://medmatix.github.io
       
 <p><a href="https://medmatixrshiny.shinyapps.io/DataProdProj/">Developing DataProducts Course Project</a></p>
       
+<p><a href="https://medmatixrshiny.shinyapps.io/DataProdProj/">Natural Language Course Project</a></p>
 
-
-
-<h3>
-<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out our <a href="https://help.github.com/pages">documentation</a> or <a href="https://github.com/contact">contact support</a> and we’ll help you sort it out.</p>
 
       <footer class="site-footer">
 
