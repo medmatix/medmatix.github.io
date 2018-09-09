@@ -1,8 +1,3 @@
-# Medmatix/Ningishzida Data Science
-## GitHub Projects Pages
-  
-http://medmatix.github.io
-
 <!DOCTYPE html>
 <html lang="en-us">
   <head>
@@ -46,7 +41,7 @@ http://medmatix.github.io
       
 <p><a href="https://medmatixrshiny.shinyapps.io/DataProdProj/">Developing DataProducts Course Project</a></p>
       
-<p><a href="https://medmatixrshiny.shinyapps.io/DataProdProj/">Natural Language Course Project</a></p>
+<p><a href="https://medmatix.github.io/DSCS_NLP_Project/">Natural Language Course Project</a></p>
 
 
       <footer class="site-footer">
