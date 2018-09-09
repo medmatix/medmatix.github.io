@@ -1,0 +1,8 @@
+title: Medmatix/Ningishzida Data Science
+description: Project pages for medmatix data science
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-time-machine
+
+gems:
+  - jekyll-mentions
