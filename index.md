@@ -14,6 +14,8 @@
 
 <h2>Project Pages</h2>
 
+<p><a href="http://medmatix.github.io/RPythonBook/">R to Python Book Project</a></p>
+
 <p><a href="http://medmatix.github.io/PML_Assignment_Report.html ">Practical Machine Learning Course Project</a></p>
 
 <p><a href="http://medmatix.github.io/libanalysis/">C++ Analytics Tools</a></p>
