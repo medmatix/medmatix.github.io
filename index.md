@@ -16,23 +16,27 @@
 
 <h2>Project Pages</h2>
     
-    <p><a href="https://medmatix.github.io/XPStarbase/">SpaceX Boca Chica - Starbase</a></p>
+    <p><a href="https://github.com/medmatix/X-Plane-Scenery">X-Plane Scenery</a></p>
     
-    <p><a href="https://medmatix.github.io/Aircraft3D_Modeling/">Aircraft 3D modeling</a></p>    
+      <p><a href="https://medmatix.github.io/XPStarbase/">SpaceX Boca Chica - Starbase</a></p>
     
-    <p><a href="https://medmatix.github.io/BCATP-Picton_Aerodrome/">BCATP Picton Aerodrome 1945</a></p>
+      <p><a href="https://medmatix.github.io/Aircraft3D_Modeling/">Aircraft 3D modeling</a></p>    
+    
+      <p><a href="https://medmatix.github.io/BCATP-Picton_Aerodrome/">BCATP Picton Aerodrome 1945</a></p>
+    
+      <p><a href="https://github.com/medmatix/WW2_Building_Models/">WW2 Period Buildings and Scenery Objects</a></p>
 
     <p><a href="https://medmatix.github.io/RPythonBook/">R to Python Book</a></p>
-
-    <p><a href="http://medmatix.github.io/PML_Assignment_Report.html ">Practical Machine Learning Course Project</a></p>
-
-    <p><a href="http://medmatix.github.io/libanalysis/">C++ Analytics Tools</a></p>
-
-    <p><a href="http://medmatix.github.io/ParHarnSo/">Parallel Systems Projects</a></p>
-
+    
     <p><a href="http://medmatix.github.io/crunches-data2/">My own Website development.</a></p>
       
     <p><a href="http://medmatix.github.io/DataSciCalc/">DataSciCalc - A Calulator Data Science Calculator Application.</a></p>
+    
+    <p><a href="http://medmatix.github.io/libanalysis/">C++ Analytics Tools</a></p>
+    
+    <p><a href="http://medmatix.github.io/ParHarnSo/">Parallel Systems Projects</a></p>
+    
+    <p><a href="http://medmatix.github.io/PML_Assignment_Report.html ">Practical Machine Learning Course Project</a></p>
    
     
   </body>
