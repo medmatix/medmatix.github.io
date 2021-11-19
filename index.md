@@ -16,7 +16,7 @@
     
     <p><a href="https://medmatix.github.io/XPStarbase/">SpaceX Boca Chica - Starbase</a></p>
     
-    <p><a href="https://medmatix.github.io/Aircraft3D_Modeling/">Aircraft #D modeling</a></p>    
+    <p><a href="https://medmatix.github.io/Aircraft3D_Modeling/">Aircraft 3D modeling</a></p>    
     
     <p><a href="https://medmatix.github.io/BCATP-Picton_Aerodrome/">BCATP Picton Aerodrome 1945</a></p>
 
