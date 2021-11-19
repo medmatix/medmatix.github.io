@@ -12,6 +12,8 @@
 
 <p><a href="https://github.com/medmatix">Profile and Master Repository Lists</a></p><br>
 
+<p><a href="http://medmatix.github.io/crunches-data2/">Back to My Home Page</a></p><br>
+
 <h2>Project Pages</h2>
     
     <p><a href="https://medmatix.github.io/XPStarbase/">SpaceX Boca Chica - Starbase</a></p>
@@ -32,9 +34,6 @@
       
     <p><a href="http://medmatix.github.io/DataSciCalc/">DataSciCalc - A Calulator Data Science Calculator Application.</a></p>
    
-
-    <h2>Home Page</h2>
-    <p><a href="http://medmatix.github.io/crunches-data2/">Back to My Home Page</a></p><br>
     
   </body>
 </html>
