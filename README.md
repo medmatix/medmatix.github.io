@@ -10,6 +10,8 @@
 
 <p>Medmatix/Ningishzida is an independent data science consultancy with particular focus on the analysis of data from general scientific and biomedical information (healthcare informatix) sources. The focus is on open source development of tools.</p>
 
+<p>With such a focus, increased emphasis on models, simulations and data visualization are inevitable. Bender 3D modeling and animation is an exciting way to model dynamic data physically. As a result I have a growing list of open-source models and simulation using Blender and Godol game engine. These and particulatly flight simulators model with applying real physics.</p>
+
 <p><a href="https://github.com/medmatix">Profile and Master Repository Lists</a></p><br>
 
 <h2>Project Pages</h2>
